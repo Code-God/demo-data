@@ -15,7 +15,7 @@ public class UserParam extends BaseParam {
 
     private static final long serialVersionUID = 114507752827655634L;
 
-    @ApiModelProperty("用户id数组")
+    @ApiModelProperty("用户id")
     private Integer id;
 
     @ApiModelProperty("角色id")

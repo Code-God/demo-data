@@ -1,14 +1,22 @@
 package com.jsure.datacenter.innerservice.inneruserservice;
 
 import com.jsure.datacenter.exception.CustomException;
+import com.jsure.datacenter.feign.UserServiceClient;
 import com.jsure.datacenter.mapper.usermapper.TUserMapper;
 import com.jsure.datacenter.model.enums.CustomErrorEnum;
 import com.jsure.datacenter.model.model.TUser;
+import com.jsure.datacenter.model.param.UserParam;
+import com.jsure.datacenter.model.result.TUserResult;
+import com.jsure.datacenter.utils.BeanMapper;
+import com.jsure.datacenter.utils.JSONUtil;
 import com.jsure.datacenter.utils.ObjectUtils;
+import com.jsure.datacenter.utils.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import springfox.documentation.spring.web.json.Json;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: wuxiaobiao
@@ -22,6 +30,9 @@ public class InnerUserService {
 
     @Autowired
     private TUserMapper tUserMapper;
+
+    @Autowired
+    private UserServiceClient userServiceClient;
 
     /**
      * 根据用户名查询用户信息
@@ -97,17 +108,32 @@ public class InnerUserService {
     }
 
     /**
-     * 查询用户列表信息
+     * 查询用户列表信息 feign
      * @param user
      * @return
      */
-    public List<TUser> findUserList(TUser user){
-        List<TUser> list = tUserMapper.selectUserList(user);
-        if (ObjectUtils.isNullOrEmpty(list) && user.getIsNullError()) {
-            throw new CustomException(CustomErrorEnum.ERROR_CODE_341001.getErrorCode(),
-                    CustomErrorEnum.ERROR_CODE_341001.getErrorDesc());
+    public List<TUserResult> findUserList(UserParam user){
+        Response<List<TUserResult>> r = userServiceClient.findUserList(user);
+        if (!CustomErrorEnum.SUCCESS_CODE_341000.getErrorCode().equals(r.getResCode())) {
+            throw new CustomException(r.getResCode(), r.getResMsg());
         }
+        List<TUserResult> list = r.getResult();
         return list;
+    }
+
+    /**
+     * 创建用户 feign
+     * @param user
+     * @return
+     */
+    public Integer addUsers2(TUser user) {
+        Response<Integer> r = userServiceClient.insertSelective(user);
+        Integer i = r.getResult();
+        if ((ObjectUtils.isNullOrEmpty(i) || i == 0) && user.getIsNullError()) {
+            throw new CustomException(CustomErrorEnum.ERROR_CODE_341010.getErrorCode(),
+                    CustomErrorEnum.ERROR_CODE_341010.getErrorDesc());
+        }
+        return i;
     }
 
 }

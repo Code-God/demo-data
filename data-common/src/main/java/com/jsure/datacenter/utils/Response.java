@@ -13,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value="Response返回值")
-public class Response {
+public class Response<T> {
 
     @ApiModelProperty("响应状态码")
     private String resCode;
@@ -22,6 +22,6 @@ public class Response {
     private String resMsg;
 
     @ApiModelProperty("响应结果")
-    private Object result;
+    private T result;
 
 }

@@ -178,7 +178,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     /**
-     * 查询用户列表信息
+     * 查询用户列表信息 feign
      *
      * @param userPram
      * @return
@@ -186,10 +186,37 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public List<TUserResult> findUserList(UserParam userPram) {
         innerUserCheck.checkUserParam(userPram);
+        List<TUserResult> list = innerUserService.findUserList(userPram);
+//        List<TUserResult> r = BeanMapper.mapList(list, TUserResult.class);
+        return list;
+    }
+
+
+    /**
+     * 创建用户 feign
+     * @param userPram
+     * @return
+     */
+    @Override
+    public Map<String, Object> addUsers2(UserInfoParam userPram) {
+        Map<String, Object> resultMap = Maps.newHashMap();
+        //判断是否有同名用户
+        TUser re = innerUserService.findByUserName(userPram.getUserName(),false);
+        if (ObjectUtils.isNotNullAndEmpty(re)) {
+            throw new CustomException(CustomErrorEnum.ERROR_CODE_341012.getErrorCode(),
+                    CustomErrorEnum.ERROR_CODE_341012.getErrorDesc());
+        }
         TUser user = new TUser();
         BeanMapper.copy(userPram, user);
-        List<TUser> list = innerUserService.findUserList(user);
-        List<TUserResult> r = BeanMapper.mapList(list, TUserResult.class);
-        return r;
+        user.setPassword(MD5Util.MD5Encrypt(userPram.getPassword()));
+        user.setCreateDate(new Date());
+        //创建用户
+        innerUserService.addUsers2(user);
+        //返回创建后的用户信息
+        TUser result = innerUserService.findByUserName(userPram.getUserName(),true);
+        TUserResult rt = new TUserResult();
+        BeanMapper.copy(result, rt);
+        resultMap.put("user", rt);
+        return resultMap;
     }
 }

@@ -31,4 +31,6 @@ public interface TokenService {
     Map<String, Object> deleteUsers(Integer[] usersId);
 
     List<TUserResult> findUserList(UserParam users);
+
+    Map<String, Object> addUsers2(UserInfoParam userParam);
 }

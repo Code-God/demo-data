@@ -205,4 +205,32 @@ public class LoginTokenController extends BaseController {
         return ResponseEntity.ok(r);
     }
 
+
+    /**
+     * 测试feigin
+     *
+     * @param userParam
+     * @return
+     */
+    @ApiOperation(value = "测试feigin", notes = "创建用户，返回创建后的用户信息")
+    @ApiImplicitParam(name = "userParam", value = "用户详细实体user", required = true, dataType = "UserInfoParam")
+    @RequestMapping(value = "/users2", method = RequestMethod.POST)
+    public ResponseEntity<Response> addUsers2(@RequestBody UserInfoParam userParam) {
+        Map<String, Object> result = Maps.newHashMap();
+        Response r = new Response();
+        try {
+            checkShiroPermission("add");
+            result = tokenService.addUsers2(userParam);
+            successResult(r, CustomConstant.CREATE_USER_SUCCESS, result);
+            log.info("success to addUser2, RESULT:{}", result);
+        } catch (CustomException e) {
+            failedResult(r, e.getCode(), e.getMessage(), result);
+            log.error("failed to addUser2, RESULT:{},cause:{}", result, e);
+        } catch (Exception e) {
+            failedResult(r, result);
+            log.error("failed to addUser2, RESULT:{},cause:{}", result, e);
+        }
+        return ResponseEntity.ok(r);
+    }
+
 }
