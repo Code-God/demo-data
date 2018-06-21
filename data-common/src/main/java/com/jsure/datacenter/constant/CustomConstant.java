@@ -49,4 +49,5 @@ public class CustomConstant {
 	public static final String CREATE_USER_SUCCESS = "创建用户成功";
 	public static final String UPDATE_USER_SUCCESS = "更新用户信息成功";
 	public static final String DELETE_USER_SUCCESS = "删除用户成功";
+	public static final String EXPORT_EXCEL_SUCCESS = "导出excel成功";
 }

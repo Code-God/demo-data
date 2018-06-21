@@ -5,19 +5,25 @@ import com.jsure.datacenter.annotation.TestAnnotation;
 import com.jsure.datacenter.constant.CustomConstant;
 import com.jsure.datacenter.controller.base.BaseController;
 import com.jsure.datacenter.exception.CustomException;
+import com.jsure.datacenter.model.model.ExcelModel;
 import com.jsure.datacenter.model.param.CrudUserParam;
 import com.jsure.datacenter.model.param.TokenPram;
 import com.jsure.datacenter.model.param.UserInfoParam;
 import com.jsure.datacenter.model.param.UserParam;
 import com.jsure.datacenter.model.result.TUserResult;
 import com.jsure.datacenter.service.userservice.TokenService;
+import com.jsure.datacenter.utils.ExcelUtil;
 import com.jsure.datacenter.utils.Response;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +37,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(value = "/bc")
-@Api(tags="用户管理",description = "测试")
+@Api(tags = "用户管理", description = "测试")
 public class LoginTokenController extends BaseController {
 
     @Autowired
@@ -154,9 +160,9 @@ public class LoginTokenController extends BaseController {
      * @return
      */
     @ApiOperation(value = "更新用户资料", notes = "根据用户资料修改信息，返回修改后的用户信息")
-    @ApiImplicitParams ({
+    @ApiImplicitParams({
             @ApiImplicitParam(name = "userParam", value = "用户详细实体user", required = true, dataType = "UserInfoParam"),
-            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "Integer",paramType = "path")
+            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "Integer", paramType = "path")
     })
     @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Response> updateUsers(@RequestBody UserInfoParam userParam, @PathVariable Integer id) {
@@ -223,6 +229,46 @@ public class LoginTokenController extends BaseController {
             result = tokenService.addUsers2(userParam);
             successResult(r, CustomConstant.CREATE_USER_SUCCESS, result);
             log.info("success to addUser2, RESULT:{}", result);
+        } catch (CustomException e) {
+            failedResult(r, e.getCode(), e.getMessage(), result);
+            log.error("failed to addUser2, RESULT:{},cause:{}", result, e);
+        } catch (Exception e) {
+            failedResult(r, result);
+            log.error("failed to addUser2, RESULT:{},cause:{}", result, e);
+        }
+        return ResponseEntity.ok(r);
+    }
+
+    /**
+     * 导出excel
+     *
+     * @return
+     */
+    @ApiOperation(value = "导出excel", notes = "导出excel")
+    @RequestMapping(value = "/export", method = RequestMethod.POST)
+    public ResponseEntity<Response> export() {
+        Map<String, Object> result = Maps.newHashMap();
+        Response r = new Response();
+        try {
+            String shettName = "测试excel导出";
+            String titleName = "测试excel导出";
+            String fileName = "测试excel导出";
+            int columnNumber = 3;
+            int[] columnWidth = {10, 20, 20};
+            String[] columnName = {"单号", "时间", "部门"};
+            String[][] dataList = {{"001", "2015-01-01", "IT"}, {"002", "2015-01-02", "市场部"}, {"003", "2015-01-03", "测试"}};
+            ExcelModel excelModel = new ExcelModel();
+            excelModel.setShettName(shettName);
+            excelModel.setTitleName(titleName);
+            excelModel.setFileName(fileName);
+            excelModel.setColumnNumber(columnNumber);
+            excelModel.setColumnWidth(columnWidth);
+            excelModel.setColumnName(columnName);
+            excelModel.setDataList(dataList);
+            //导出excel
+            ExcelUtil.ExportWithResponse(excelModel, response, request);
+            successResult(r, CustomConstant.EXPORT_EXCEL_SUCCESS, result);
+            log.info("success to export, RESULT:{}", result);
         } catch (CustomException e) {
             failedResult(r, e.getCode(), e.getMessage(), result);
             log.error("failed to addUser2, RESULT:{},cause:{}", result, e);
