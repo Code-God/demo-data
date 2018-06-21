@@ -90,6 +90,8 @@ public class ShiroConfig {
         // 开放登录
         filterRuleMap.put("/bc/login", "restFilter,anon");
         filterRuleMap.put("/bc/logout", "restFilter,anon");
+        //开放微信验证
+        filterRuleMap.put("/wechat", "restFilter,anon");
         // 拦截所以请求
         filterRuleMap.put("/**", "restFilter,authToken");
         factoryBean.setFilterChainDefinitionMap(filterRuleMap);
