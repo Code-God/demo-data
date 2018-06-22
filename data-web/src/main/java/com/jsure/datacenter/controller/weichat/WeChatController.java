@@ -1,9 +1,13 @@
 package com.jsure.datacenter.controller.weichat;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,13 +15,15 @@ import java.util.Arrays;
 
 /**
  * @Author: wuxiaobiao
- * @Description:
+ * @Description: 微信签名
  * @Date: Created in 2018/6/21
  * @Time: 16:51
  * I am a Code Man -_-!
  */
 @Slf4j
-@RequestMapping("/wechat")
+@RestController
+@RequestMapping("/")
+@Api(tags = "微信", description = "微信签名")
 public class WeChatController {
 
     // URL:   http://www.xxxx.com/wechat/
@@ -27,7 +33,7 @@ public class WeChatController {
 
     /**
      * 验证微信后台配置的服务器地址有效性
-     *
+     * <p>
      * 接收并校验四个请求参数
      *
      * @param signature 微信加密签名
@@ -36,7 +42,8 @@ public class WeChatController {
      * @param echostr   随机字符串
      * @return echostr
      */
-    @GetMapping("/")
+    @ApiOperation(value = "微信校验签名", notes = "微信校验签名")
+    @RequestMapping(value = "/wechat", method = RequestMethod.GET)
     public String checkName(@RequestParam(name = "signature") String signature,
                             @RequestParam(name = "timestamp") String timestamp,
                             @RequestParam(name = "nonce") String nonce,
@@ -68,6 +75,7 @@ public class WeChatController {
 
     /**
      * 排序方法
+     *
      * @param token     Token
      * @param timestamp 时间戳
      * @param nonce     随机数
@@ -87,7 +95,7 @@ public class WeChatController {
      * 将字符串进行sha1加密
      *
      * @param str 需要加密的字符串
-     * @return    加密后的内容
+     * @return 加密后的内容
      */
     public String sha1(String str) {
         try {
