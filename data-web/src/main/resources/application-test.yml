@@ -25,7 +25,7 @@ security-user:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://${security-user.name}:${security-user.password}@localhost:8085/eureka/  # http://${security-user.name}:${security-user.password}@localhost:8086/eureka/
+      defaultZone: http://${security-user.name}:${security-user.password}@47.98.150.108:8085/eureka/  # http://${security-user.name}:${security-user.password}@localhost:8086/eureka/
 
 #mybatis
 mybatis:
